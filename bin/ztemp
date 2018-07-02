@@ -1,0 +1,57 @@
+#!/bin/bash
+
+ZTEMP_HOME="${AWS_REGION:-$(pwd)}"
+
+CONF_FILE="$ZTEMP_HOME/conf/ztemp_conf.json"
+LOG_FILE="/var/log/ztemp.log"
+PID_FILE="/var/run/ztemp.pid"
+
+
+function start() {
+    ls $PID_FILE > /dev/null 2>&1
+    ret_code=$?
+    if [[ $ret_code == 0 ]]; then
+        echo "Can't start ZTemp bot. It's running already."
+        exit 1
+    fi
+    PYTHONPATH="$ZTEMP_HOME" nohup python3 "$ZTEMP_HOME/ztemp/main.py" $CONF_FILE > $LOG_FILE 2>&1 &
+    echo $! > $PID_FILE
+}
+
+function stop() {
+    kill $(cat $PID_FILE 2> /dev/null) 2> /dev/null
+    rm -f $PID_FILE
+}
+
+function status() {
+    pid_value="$(cat $PID_FILE 2> /dev/null)"
+    if [[ "$pid_value" != "" ]]; then
+        echo "ZTemp bot is running (PID $pid_value)."
+    else
+        echo "ZTemp bot is stopped."
+    fi
+}
+
+
+CMD="$1"
+case $CMD in
+    start)
+        echo "Starting ZTemp bot..."
+        start
+        ;;
+    stop)
+        echo "Stopping ZTemp bot..."
+        stop
+        ;;
+    restart)
+        echo "Restarting ZTemp bot..."
+        stop
+        start
+        ;;
+    status)
+        status
+        ;;
+    *)
+        echo "Invalid command '$CMD'"
+        exit 1
+esac

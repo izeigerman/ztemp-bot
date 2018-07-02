@@ -1,0 +1,10 @@
+{
+  "sensor": {
+    "read_interval": 5,
+    "pin": 23
+  },
+  "telegram": {
+    "token": "<token>",
+    "chat_id": "<chat_id>"
+  }
+}
