@@ -1,6 +1,6 @@
 #!/bin/bash
 
-ZTEMP_HOME="${AWS_REGION:-$(pwd)}"
+ZTEMP_HOME="${ZTEMP_HOME:-$(dirname $(dirname $0))}"
 
 CONF_FILE="$ZTEMP_HOME/conf/ztemp_conf.json"
 LOG_FILE="/var/log/ztemp.log"

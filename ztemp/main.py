@@ -3,7 +3,7 @@ import json
 import sys
 from ztemp.bot import ZtempBot
 from ztemp.controller import SensorController
-from ztemp.sensor import (DummySensor, SensorReading)
+from ztemp.sensor import DHTSensor
 
 
 def run():
@@ -22,8 +22,7 @@ def run():
     sensor_read_interval = config['sensor']['read_interval']
     sensor_pin = config['sensor']['pin']
 
-    reading = SensorReading(28.0, 56.0)
-    sensor = DummySensor(reading)
+    sensor = DHTSensor(sensor_pin)
     controller = SensorController(sensor)
     bot = ZtempBot(telegram_token, controller, sensor_read_interval,
                    bot_chat_id)

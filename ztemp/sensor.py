@@ -1,3 +1,5 @@
+import Adafruit_DHT
+
 
 class SensorReading:
     def __init__(self, temp, humidity):
@@ -13,19 +15,18 @@ class SensorReading:
         return self._humidity
 
 
+class DHTSensor:
+    def __init__(self, pin):
+        self._pin = pin
+
+    def read(self):
+        hum, temp = Adafruit_DHT.read_retry(Adafruit_DHT.DHT22, self._pin)
+        return SensorReading(temp, hum)
+
+
 class DummySensor:
     def __init__(self, reading):
         self._reading = reading
 
     def read(self):
         return self._reading
-
-
-class DHTSensor:
-    def __init__(self, pin):
-        import Adafruit_DHT
-        self._pin = pin
-
-    def read(self):
-        hum, temp = Adafruit_DHT.read_retry(Adafruit_DHT.DHT22, self._pin)
-        return SensorReading(temp, hum)
