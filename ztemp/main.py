@@ -21,7 +21,7 @@ def run():
     with open(sys.argv[1], 'r') as fd:
         config = json.load(fd)
 
-    settings_file = argv[2]
+    settings_file = sys.argv[2]
     telegram_token = config['telegram']['token']
     bot_chat_id = config['telegram']['chat_id']
     sensor_read_interval = config['sensor']['read_interval']
