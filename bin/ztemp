@@ -3,6 +3,7 @@
 ZTEMP_HOME="${ZTEMP_HOME:-$(dirname $(dirname $0))}"
 
 CONF_FILE="$ZTEMP_HOME/conf/ztemp_conf.json"
+TEMP_SETTINGS_FILE="$ZTEMP_HOME/conf/temp_settings.json"
 LOG_FILE="/var/log/ztemp.log"
 PID_FILE="/var/run/ztemp.pid"
 
@@ -14,7 +15,7 @@ function start() {
         echo "Can't start ZTemp bot. It's running already."
         exit 1
     fi
-    PYTHONPATH="$ZTEMP_HOME" nohup python3 "$ZTEMP_HOME/ztemp/main.py" $CONF_FILE > $LOG_FILE 2>&1 &
+    PYTHONPATH="$ZTEMP_HOME" nohup python3 "$ZTEMP_HOME/ztemp/main.py" $CONF_FILE $TEMP_SETTINGS_FILE > $LOG_FILE 2>&1 &
     echo $! > $PID_FILE
 }
 

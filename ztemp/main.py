@@ -14,16 +14,21 @@ def run():
         print('Missing configuration file')
         sys.exit()
 
+    if len(sys.argv) < 3:
+        print('Missing temperature settings file')
+        sys.exit()
+
     with open(sys.argv[1], 'r') as fd:
         config = json.load(fd)
 
+    settings_file = argv[2]
     telegram_token = config['telegram']['token']
     bot_chat_id = config['telegram']['chat_id']
     sensor_read_interval = config['sensor']['read_interval']
     sensor_pin = config['sensor']['pin']
 
     sensor = DHTSensor(sensor_pin)
-    controller = SensorController(sensor)
+    controller = SensorController(sensor, settings_file=settings_file)
     bot = ZtempBot(telegram_token, controller, sensor_read_interval,
                    bot_chat_id)
     bot.run()
