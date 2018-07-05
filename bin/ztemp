@@ -1,6 +1,6 @@
 #!/bin/bash
 
-ZTEMP_HOME="${ZTEMP_HOME:-$(dirname $(dirname $0))}"
+ZTEMP_HOME="${ZTEMP_HOME:-$(dirname $(dirname $(readlink -f $0)))}"
 
 CONF_FILE="$ZTEMP_HOME/conf/ztemp_conf.json"
 TEMP_SETTINGS_FILE="$ZTEMP_HOME/conf/temp_settings.json"
