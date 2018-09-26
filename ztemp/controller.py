@@ -3,12 +3,14 @@ import logging
 
 
 class SensorController:
-    def __init__(self, sensor, settings_file=None):
+    def __init__(self, sensor, settings_file=None, num_of_reading_retries=3):
         self._sensor = sensor
         self._max_temp = None
         self._min_temp = None
         self._alert_fired = False
         self._settings_file = settings_file
+        self._previous_tick_reading = None
+        self._num_of_reading_retries = num_of_reading_retries
         self._logger = logging.getLogger('SensorController')
         self._load_settings()
 
@@ -21,7 +23,7 @@ class SensorController:
                     self._min_temp = settings.get('min_temp', None)
             except FileNotFoundError:
                 pass
-            except:
+            except:  # noqa
                 self._logger.exception('Failed to load settings')
 
     def _save_settings(self):
@@ -33,7 +35,7 @@ class SensorController:
                         'min_temp': self._min_temp
                     }
                     json.dump(settings, fd)
-            except:
+            except:  # noqa
                 self._logger.exception('Failed to save settings')
 
     def _is_within_constrains(self, r):
@@ -63,14 +65,24 @@ class SensorController:
         return self._min_temp
 
     def tick(self):
-        res = self.get_sensor_reading()
-        if res:
-            if not self._alert_fired and not self._is_within_constrains(res):
+        if self._previous_tick_reading:
+            for i in range(self._num_of_reading_retries + 1):
+                reading = self.get_sensor_reading()
+                prev_temp = self._previous_tick_reading.temp
+                if reading and abs(reading.temp - prev_temp) < 1.0:
+                    break
+        else:
+            reading = self.get_sensor_reading()
+
+        if reading:
+            self._previous_tick_reading = reading
+            is_alert_fired = self._alert_fired
+            if not is_alert_fired and not self._is_within_constrains(reading):
                 self._alert_fired = True
                 msg = 'WARNING: the temperature has reached '
-                msg += '{0:.1f}°C'.format(res.temp)
+                msg += '{0:.1f}°C'.format(reading.temp)
                 return msg
-            elif self._alert_fired and self._is_within_constrains(res):
+            elif self._alert_fired and self._is_within_constrains(reading):
                 self._alert_fired = False
 
         return None
